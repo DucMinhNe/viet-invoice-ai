@@ -7,3 +7,4 @@
 - Added regex fallback parser for demos.
 - Added sample invoice data.
 - Added README, banner, usage guide, technical notes, and smoke test.
+- minor doc updates
