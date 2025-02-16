@@ -127,4 +127,6 @@ More details:
 
 ```text
 Private local AI tool for extracting structured JSON from Vietnamese invoices using Ollama.
-``` 
+```
+
+## Roadmap
