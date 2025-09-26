@@ -1,0 +1,19 @@
+<svg width="1200" height="420" viewBox="0 0 1200 420" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="420" fill="#08111F"/>
+  <rect x="70" y="58" width="1060" height="304" rx="26" fill="#101B2D" stroke="#38BDF8" stroke-width="2"/>
+  <text x="104" y="145" fill="#F8FAFC" font-family="Arial, Helvetica, sans-serif" font-size="62" font-weight="800">VietInvoice AI</text>
+  <text x="108" y="202" fill="#CBD5E1" font-family="Arial, Helvetica, sans-serif" font-size="26">Private local AI extraction for Vietnamese invoices and receipts</text>
+  <rect x="108" y="250" width="170" height="44" rx="22" fill="#38BDF8"/>
+  <text x="136" y="280" fill="#08111F" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700">Ollama</text>
+  <rect x="296" y="250" width="186" height="44" rx="22" fill="#22C55E"/>
+  <text x="324" y="280" fill="#08111F" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700">JSON Output</text>
+  <rect x="500" y="250" width="206" height="44" rx="22" fill="#F97316"/>
+  <text x="528" y="280" fill="#08111F" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700">Vietnamese Docs</text>
+  <rect x="850" y="110" width="174" height="218" rx="16" fill="#F8FAFC"/>
+  <rect x="875" y="146" width="124" height="12" rx="6" fill="#38BDF8"/>
+  <rect x="875" y="178" width="110" height="10" rx="5" fill="#94A3B8"/>
+  <rect x="875" y="204" width="132" height="10" rx="5" fill="#94A3B8"/>
+  <rect x="875" y="230" width="86" height="10" rx="5" fill="#94A3B8"/>
+  <rect x="875" y="270" width="124" height="32" rx="8" fill="#22C55E"/>
+  <path d="M798 220H736M736 220L760 196M736 220L760 244" stroke="#38BDF8" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
