@@ -56,6 +56,12 @@ Run without Ollama using the fallback parser:
 python3 main.py data/sample_invoice.txt --fallback-only
 ```
 
+Run a quick smoke test:
+
+```bash
+python3 scripts/smoke_test.py
+```
+
 Run with local AI:
 
 ```bash
@@ -103,6 +109,11 @@ viet-invoice-ai/
 ## Notes
 
 This project starts from extracted text, which means it can be connected to OCR or PDF text extraction later. The current focus is the AI extraction layer: turning messy Vietnamese invoice text into structured JSON.
+
+More details:
+
+- [Usage Guide](./docs/usage.md)
+- [Technical Notes](./docs/technical-notes.md)
 
 ## Future Improvements
 
