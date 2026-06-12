@@ -179,3 +179,7 @@ viet-invoice-ai/
 - CSV / Excel export.
 - Batch processing for folders of invoices.
 - JSON schema validation for local AI responses.
+
+## License
+
+Released under the [MIT License](LICENSE).
