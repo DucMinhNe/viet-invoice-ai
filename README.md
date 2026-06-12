@@ -2,16 +2,18 @@
 
 ![VietInvoice AI](./docs/banner.svg)
 
-![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white)
-![Ollama](https://img.shields.io/badge/Ollama-Local%20AI-111111?style=for-the-badge)
-![JSON](https://img.shields.io/badge/Output-Structured%20JSON-22C55E?style=for-the-badge)
-![Vietnamese](https://img.shields.io/badge/Vietnamese-Invoice%20AI-F97316?style=for-the-badge)
+> **Privacy-first extraction of structured JSON from Vietnamese invoices — powered by a local LLM via Ollama, with a zero-dependency regex fallback so it always works.**
 
-**VietInvoice AI** is a small local AI tool that extracts structured data from Vietnamese invoices and receipts. It is designed for privacy-first workflows where invoice text should be processed on the user's own machine instead of being sent to a cloud API.
+![Python](https://img.shields.io/badge/Python-3.9+-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![Ollama](https://img.shields.io/badge/Ollama-Local%20LLM-111111?style=for-the-badge)
+![Dependencies](https://img.shields.io/badge/Dependencies-None%20(stdlib%20only)-22C55E?style=for-the-badge)
+![Output](https://img.shields.io/badge/Output-Structured%20JSON-F97316?style=for-the-badge)
 
-The tool uses **Ollama** when a local model is available, and includes a rule-based fallback parser so the demo still works without a running model.
+Vietnamese businesses handle invoices, receipts, and payment documents full of sensitive financial data. **VietInvoice AI** turns messy Vietnamese invoice text into clean, structured JSON — entirely on your own machine. Nothing is ever sent to a cloud API.
 
-## What It Extracts
+```bash
+python3 main.py data/sample_invoice.txt
+```
 
 ```json
 {
@@ -22,47 +24,69 @@ The tool uses **Ollama** when a local model is available, and includes a rule-ba
   "buyer": "Cong ty Co phan Minh An",
   "description": "Phi trien khai he thong AI phan tich du lieu noi bo",
   "total_amount_vnd": 24500000,
-  "confidence": 1.0
+  "confidence": 1.0,
+  "_engine": "ollama:llama3.2"
 }
 ```
 
-## Why This Project Exists
+## Features
 
-Vietnamese businesses often handle invoices, receipts, and payment documents that contain sensitive financial information. A local AI extractor can help teams:
+- **Local LLM extraction via Ollama** — talks to the Ollama HTTP API (`/api/chat`) with a strict-JSON system prompt and low temperature for deterministic field extraction. Your invoice text never leaves your machine.
+- **Automatic model selection** — queries your installed models (`/api/tags`) and picks the best available from a preference list (`llama3.2`, `llama3.1`, `qwen2.5`, `qwen2`, `mistral`, `gemma2`), falling back to whatever you have pulled.
+- **Graceful degradation** — if Ollama is down or the model returns invalid JSON, the CLI automatically falls back to a rule-based parser and tells you on stderr. The pipeline never just dies.
+- **Vietnamese-aware regex fallback** — normalizes the full set of Vietnamese diacritics (`đ → d`, `ế → e`, …) before matching labeled fields like `Ma so thue`, `So hoa don`, `Ngay`, `Khach hang`, `Tong cong`.
+- **VND amount parsing** — converts Vietnamese-formatted totals like `24.500.000 VND` into a plain integer (`24500000`) ready for accounting systems.
+- **Confidence scoring** — the fallback parser reports how many of the 7 target fields it actually found, so downstream code can decide whether to trust the result.
+- **Engine provenance** — every result carries an `_engine` field (`ollama:<model>` or `regex-fallback`) so you always know how the data was produced.
+- **Zero third-party dependencies** — pure Python standard library (`urllib`, `re`, `json`, `argparse`, `pathlib`). No `pip install`, no virtualenv required.
 
-- reduce manual data entry
-- prepare invoice data for accounting systems
-- review tax codes and invoice numbers faster
-- keep document text on the local machine
-- build an internal document automation workflow
-
-## Architecture
+## How It Works
 
 ```mermaid
 flowchart LR
-    A["Invoice PDF / OCR text"] --> B["VietInvoice AI CLI"]
-    B --> C{"Ollama available?"}
-    C -->|Yes| D["Local LLM extraction"]
-    C -->|No| E["Regex fallback parser"]
-    D --> F["Structured JSON"]
-    E --> F["Structured JSON"]
+    A["Invoice text<br/>(from PDF / OCR)"] --> B["CLI<br/>main.py"]
+    B --> C{"Ollama reachable?"}
+    C -->|Yes| D["Pick best installed model<br/>(llama3.2 → gemma2)"]
+    D --> E["Strict-JSON chat completion<br/>temperature 0.1"]
+    C -->|"No / bad JSON"| F["Regex fallback parser<br/>+ diacritic normalization"]
+    E --> G["Structured JSON<br/>with _engine tag"]
+    F --> G
 ```
 
-## Quick Start
+The project deliberately starts from **extracted text** rather than raw PDFs or images: the AI extraction layer is the hard, interesting part, and it can be plugged behind any OCR or PDF-text pipeline later.
 
-Run without Ollama using the fallback parser:
+### Output Schema
+
+| Field | Type | Example |
+|---|---|---|
+| `vendor` | string | `CONG TY TNHH CONG NGHE SAO VIET` |
+| `tax_code` | string | `0312345678` |
+| `invoice_number` | string | `HD-2026-0420` |
+| `date` | string | `20/04/2026` |
+| `buyer` | string | `Cong ty Co phan Minh An` |
+| `description` | string | `Phi trien khai he thong AI...` |
+| `total_amount_vnd` | integer | `24500000` |
+| `confidence` | float | `1.0` |
+| `_engine` | string | `ollama:llama3.2` or `regex-fallback` |
+
+## Getting Started
+
+### Prerequisites
+
+- **Python 3.9+** — that's it for fallback mode (the project uses only the standard library).
+- **[Ollama](https://ollama.com)** with at least one pulled model — only needed for local AI mode.
+
+### Run without a local model (regex fallback)
+
+Works anywhere Python runs, instantly:
 
 ```bash
+git clone https://github.com/DucMinhNe/viet-invoice-ai.git
+cd viet-invoice-ai
 python3 main.py data/sample_invoice.txt --fallback-only
 ```
 
-Run a quick smoke test:
-
-```bash
-python3 scripts/smoke_test.py
-```
-
-Run with local AI:
+### Run with local AI (Ollama)
 
 ```bash
 ollama serve
@@ -70,7 +94,30 @@ ollama pull llama3.2
 python3 main.py data/sample_invoice.txt
 ```
 
-## Example Output
+If Ollama isn't running, the CLI prints a notice to stderr and transparently uses the fallback parser instead.
+
+### Smoke test
+
+A self-contained end-to-end check that runs the CLI against the bundled sample invoice and validates the required fields:
+
+```bash
+python3 scripts/smoke_test.py
+# Smoke test passed.
+```
+
+### CLI Reference
+
+```text
+usage: main.py [-h] [--fallback-only] file
+
+positional arguments:
+  file             Path to invoice text extracted from PDF/OCR.
+
+optional arguments:
+  --fallback-only  Skip Ollama and use the local rule parser.
+```
+
+## Example: Fallback Mode
 
 ```bash
 python3 main.py data/sample_invoice.txt --fallback-only
@@ -95,38 +142,40 @@ python3 main.py data/sample_invoice.txt --fallback-only
 
 ```text
 viet-invoice-ai/
-├── main.py
+├── main.py                        # Entry point — delegates to the CLI
 ├── viet_invoice_ai/
-│   ├── cli.py
-│   ├── fallback_parser.py
-│   └── ollama_client.py
+│   ├── cli.py                     # Argument parsing + engine orchestration
+│   ├── ollama_client.py           # Ollama HTTP client, model selection, JSON prompt
+│   └── fallback_parser.py         # Diacritic normalization + labeled-field regex parser
+├── scripts/
+│   └── smoke_test.py              # End-to-end CLI smoke test
 ├── data/
-│   └── sample_invoice.txt
+│   └── sample_invoice.txt         # Sample Vietnamese service invoice
 └── docs/
-    └── banner.svg
+    ├── banner.svg                 # Project banner
+    ├── usage.md                   # Usage guide (fallback vs. local AI mode)
+    └── technical-notes.md         # Extraction strategy and target schema notes
 ```
 
-## Notes
+## Tech Stack
 
-This project starts from extracted text, which means it can be connected to OCR or PDF text extraction later. The current focus is the AI extraction layer: turning messy Vietnamese invoice text into structured JSON.
+| Layer | Choice | Why |
+|---|---|---|
+| Language | Python 3.9+ (stdlib only) | Zero-install portability — no dependencies to manage |
+| Local AI | [Ollama](https://ollama.com) HTTP API | Private, on-device LLM inference; model-agnostic |
+| LLM models | llama3.2 / llama3.1 / qwen2.5 / qwen2 / mistral / gemma2 | Auto-selected from whatever is installed |
+| Fallback engine | `re` + Vietnamese diacritic translation table | Deterministic, offline, demo-friendly |
+| Output | JSON (UTF-8, `ensure_ascii=False`) | Easy to pipe into accounting tools and scripts |
 
-More details:
+## Documentation
 
-- [Usage Guide](./docs/usage.md)
-- [Technical Notes](./docs/technical-notes.md)
-
-## Future Improvements
-
-- Add real PDF text extraction.
-- Add OCR for scanned receipt images.
-- Export results to CSV or Excel.
-- Add batch processing for folders of invoices.
-- Add JSON schema validation for local AI responses.
-
-## GitHub Description
-
-```text
-Private local AI tool for extracting structured JSON from Vietnamese invoices using Ollama.
-```
+- [Usage Guide](./docs/usage.md) — fallback vs. local AI mode, recommended input labels
+- [Technical Notes](./docs/technical-notes.md) — extraction strategy and target JSON schema
 
 ## Roadmap
+
+- Real PDF text extraction.
+- OCR for scanned receipt images.
+- CSV / Excel export.
+- Batch processing for folders of invoices.
+- JSON schema validation for local AI responses.
