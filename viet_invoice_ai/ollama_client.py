@@ -61,6 +61,7 @@ Invoice text:
     payload = {
         "model": model,
         "stream": False,
+        "format": "json",
         "messages": [
             {
                 "role": "system",
