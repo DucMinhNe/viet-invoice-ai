@@ -7,7 +7,7 @@ PATTERNS = {
     "date": r"(?:ngay|date)\s*[:\-]?\s*(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{4})",
     "buyer": r"(?:khach hang|buyer)\s*[:\-]?\s*(.+)",
     "description": r"(?:noi dung|description)\s*[:\-]?\s*(.+)",
-    "total_amount_vnd": r"(?:tong cong|tong thanh toan|total)\s*[:\-]?\s*([0-9\.,]+)",
+    "total_amount_vnd": r"(?:tong cong|tong thanh toan|total)\s*[:\-]?\s*([0-9\., ]+)",
 }
 
 
