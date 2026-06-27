@@ -60,7 +60,13 @@ def extract_with_rules(text):
     for key, pattern in PATTERNS.items():
         match = re.search(pattern, normalized, flags=re.I)
         if match:
-            result[key] = match.group(1).strip()
+            # normalize() is a 1:1 character translation plus lowercasing, so the
+            # match spans line up with the original text. Slice the value out of
+            # `text` to keep the real casing and diacritics (e.g. "HD-2026-0420",
+            # "Cong ty Co phan Minh An") instead of the lowercased, accent-stripped
+            # form that is only meant for matching.
+            start, end = match.span(1)
+            result[key] = text[start:end].strip()
 
     result["total_amount_vnd"] = amount_to_int(result["total_amount_vnd"])
     found = sum(1 for key, value in result.items() if key not in {"confidence", "notes"} and value)
