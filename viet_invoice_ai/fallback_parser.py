@@ -2,7 +2,7 @@ import re
 
 
 PATTERNS = {
-    "tax_code": r"(?:ma so thue|mst|tax code)\s*[:\-]?\s*([0-9]{10,13})",
+    "tax_code": r"(?:ma so thue|mst|tax code)\s*[:\-]?\s*([0-9]{10}(?:-[0-9]{3})?|[0-9]{13})",
     "invoice_number": r"(?:so hoa don|invoice no|invoice number)\s*[:\-]?\s*([A-Z0-9\-]+)",
     "date": r"(?:ngay|date)\s*[:\-]?\s*(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{4})",
     "buyer": r"(?:khach hang|buyer)\s*[:\-]?\s*(.+)",
@@ -69,6 +69,6 @@ def extract_with_rules(text):
             result[key] = text[start:end].strip()
 
     result["total_amount_vnd"] = amount_to_int(result["total_amount_vnd"])
-    found = sum(1 for key, value in result.items() if key not in {"confidence", "notes"} and value)
+    found = sum(1 for key, value in result.items() if key not in {"confidence", "notes"} and value is not None)
     result["confidence"] = round(found / 7, 2)
     return result
