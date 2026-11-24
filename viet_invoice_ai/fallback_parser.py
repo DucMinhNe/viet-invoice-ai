@@ -4,10 +4,10 @@ import re
 PATTERNS = {
     "tax_code": r"(?:ma so thue|mst|tax code)\s*[:\-]?\s*([0-9]{10}(?:-[0-9]{3})?|[0-9]{13})",
     "invoice_number": r"(?:so hoa don|invoice no|invoice number)\s*[:\-]?\s*([A-Z0-9\-]+)",
-    "date": r"(?:ngay|date)\s*[:\-]?\s*(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{4})",
+    "date": r"(?:ngay|date)\s*[:\-]?\s*(\d{1,2}\s+thang\s+\d{1,2}\s+nam\s+\d{4}|\d{4}[\/\-]\d{1,2}[\/\-]\d{1,2}|\d{1,2}[\/\-]\d{1,2}[\/\-]\d{4})",
     "buyer": r"(?:khach hang|buyer)\s*[:\-]?\s*(.+)",
     "description": r"(?:noi dung|description)\s*[:\-]?\s*(.+)",
-    "total_amount_vnd": r"(?:tong cong|tong thanh toan|total)\s*[:\-]?\s*([0-9\., ]+)",
+    "total_amount_vnd": r"(?:tong cong|tong thanh toan|tong tien|thanh tien|total)\s*[:\-]?\s*([0-9\., ]+)",
 }
 
 
