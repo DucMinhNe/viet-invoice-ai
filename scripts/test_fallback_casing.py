@@ -43,6 +43,41 @@ def main():
         print(f"FAIL zero_result: total={zero_result.get('total_amount_vnd')}, confidence={zero_result.get('confidence')}")
         return 1
 
+    # Statutory date & alternate total label tests
+    statutory_text = (
+        "CONG TY CO PHAN SAO KIM\n"
+        "Ma so thue: 0312345678\n"
+        "So hoa don: HD-2026-9999\n"
+        "Khach hang: Nguyen Van A\n"
+        "Noi dung: Tu van chuyen doi so\n"
+        "Ngay 15 thang 04 nam 2026\n"
+        "Tong tien: 25.000.000 VND\n"
+    )
+    statutory_result = extract_with_rules(statutory_text)
+    if statutory_result.get("date") != "15 thang 04 nam 2026":
+        print(f"FAIL statutory date: expected '15 thang 04 nam 2026', got {statutory_result.get('date')!r}")
+        return 1
+    if statutory_result.get("total_amount_vnd") != 25000000:
+        print(f"FAIL statutory total: expected 25000000, got {statutory_result.get('total_amount_vnd')!r}")
+        return 1
+
+    iso_text = (
+        "CONG TY TNHH LOGISTICS\n"
+        "Ma so thue: 0312345678\n"
+        "So hoa don: HD-2026-0001\n"
+        "Khach hang: Cong ty Alpha\n"
+        "Noi dung: Cuoc van chuyen\n"
+        "Date: 2026-04-15\n"
+        "Thanh tien: 10.500.000 VND\n"
+    )
+    iso_result = extract_with_rules(iso_text)
+    if iso_result.get("date") != "2026-04-15":
+        print(f"FAIL iso date: expected '2026-04-15', got {iso_result.get('date')!r}")
+        return 1
+    if iso_result.get("total_amount_vnd") != 10500000:
+        print(f"FAIL iso total: expected 10500000, got {iso_result.get('total_amount_vnd')!r}")
+        return 1
+
     print("Fallback casing test passed.")
     return 0
 
