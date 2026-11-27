@@ -78,6 +78,25 @@ def main():
         print(f"FAIL iso total: expected 10500000, got {iso_result.get('total_amount_vnd')!r}")
         return 1
 
+    header_text = (
+        "HÓA ĐƠN GIÁ TRỊ GIA TĂNG\n"
+        "(Bản thể hiện của hóa đơn điện tử)\n"
+        "Công ty Cổ phần Công nghệ Minh Lê\n"
+        "Ma so thue: 0312345678\n"
+        "So hoa don: HD-2026-0042\n"
+        "Ngay: 27.11.2026\n"
+        "Khach hang: Nguyen Van A\n"
+        "Noi dung: Dich vu phan mem\n"
+        "Tong cong: 1.000.000 VND\n"
+    )
+    header_result = extract_with_rules(header_text)
+    if header_result.get("vendor") != "Công ty Cổ phần Công nghệ Minh Lê":
+        print(f"FAIL vendor skip header: expected 'Công ty Cổ phần Công nghệ Minh Lê', got {header_result.get('vendor')!r}")
+        return 1
+    if header_result.get("date") != "27.11.2026":
+        print(f"FAIL dot date: expected '27.11.2026', got {header_result.get('date')!r}")
+        return 1
+
     print("Fallback casing test passed.")
     return 0
 
