@@ -97,6 +97,41 @@ def main():
         print(f"FAIL dot date: expected '27.11.2026', got {header_result.get('date')!r}")
         return 1
 
+    template_header_text = (
+        "Mẫu số: 1/001\n"
+        "Ký hiệu: 1C26TML\n"
+        "HÓA ĐƠN GIÁ TRỊ GIA TĂNG\n"
+        "(Bản thể hiện của hóa đơn điện tử)\n"
+        "Đơn vị bán hàng: Công ty Cổ phần Công nghệ Sao Việt\n"
+        "Mã số thuế: 0101234567 - 001\n"
+        "Số hóa đơn: HD-2026-0042\n"
+        "Ngày: 28/11/2026\n"
+        "Khách hàng: Nguyen Van A\n"
+        "Nội dung: Dich vu phan mem\n"
+        "Tổng cộng: 1.000.000 VND\n"
+    )
+    template_result = extract_with_rules(template_header_text)
+    if template_result.get("vendor") != "Công ty Cổ phần Công nghệ Sao Việt":
+        print(f"FAIL vendor skip template/serial: expected 'Công ty Cổ phần Công nghệ Sao Việt', got {template_result.get('vendor')!r}")
+        return 1
+    if template_result.get("tax_code") != "0101234567 - 001":
+        print(f"FAIL spaced branch tax code: expected '0101234567 - 001', got {template_result.get('tax_code')!r}")
+        return 1
+
+    tax13_text = (
+        "Công ty TNHH Viễn Thông\n"
+        "Mã số thuế: 0101234567890\n"
+        "Số hóa đơn: HD-2026-0099\n"
+        "Ngày: 28/11/2026\n"
+        "Khách hàng: Nguyen Van A\n"
+        "Nội dung: Cuoc vien thong\n"
+        "Tổng cộng: 500.000 VND\n"
+    )
+    tax13_result = extract_with_rules(tax13_text)
+    if tax13_result.get("tax_code") != "0101234567890":
+        print(f"FAIL 13-digit tax code: expected '0101234567890', got {tax13_result.get('tax_code')!r}")
+        return 1
+
     print("Fallback casing test passed.")
     return 0
 
